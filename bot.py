@@ -15,6 +15,7 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
 
 @bot.command(name="test",help="This is a test!")
+@commands.has_role("bot dev")
 async def on_message(ctx):
     await ctx.send("success")
     
