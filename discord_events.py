@@ -17,17 +17,17 @@ class events:
                 json_file.close()
         return event_list
     
-    def generate_event(PATH,event_name,event_date):
+    def generate_event(PATH,event_name,event_date,id):
         while True:
             uID = "".join(random.choice(string.ascii_letters) for i in range(8))+".json"
             new_path = os.path.join(PATH,uID)
             if os.path.isfile(PATH+"/"+uID+".json") is False:
                 break
-        event_data = {"event_name":event_name,"event_date":event_date,"event_participants":[],"uID":uID}   
+        event_data = {"event_name":event_name,"event_date":event_date,"event_participants":[],"uID":uID[:8],"creator":id}   
         f = open(new_path,"w+")
         json.dump(event_data,f)
         f.close()
-        return uID
+        return uID[:8]
     
     def garbage_collect(PATH):
         curr_day,curr_month,curr_year = datetime.now().strftime('%d/%m/%Y').split("/")
@@ -53,4 +53,21 @@ class events:
                 cnt+=1
                 to_remove.append(file)
         return to_remove
+                    
+                    
+    def alter_description(PATH,new_description,event_id,creator):
+        filepath = os.path.join(PATH,event_id,".json")
+        try:
+            f = open(filepath,"w")
+        except:
+            raise ("Invalid ID: Eventfile not found!")
+        json_data = json.load(filepath)
+        if json_data["creator"] != creator:
+            f.close()
+            return 1
+        json_data["description"] = new_description
+        json.dump(json_data,f)
+        f.close()
+        return 0
+            
                     

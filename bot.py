@@ -35,10 +35,20 @@ async def on_message(ctx):
 @commands.has_role("bot dev")
 async def on_message(ctx,event_name,event_date):
     if event_name and event_date:
-        uID = discord_events.events.generate_event(os.getcwd(),event_name,event_date)
+        uID = discord_events.events.generate_event(os.getcwd(),event_name,event_date,message.author.id)
         await ctx.send("Event was succcessfully generated and added to the db! Your EventID is "+str(uID))
         
-    
+@bot.command(name="eventdescription",help="Please provide description in quotation marks")
+@commands.has_role("bot dev")
+async def on_message(ctx,event_id,desc):
+    if desc:
+        x = discord_events.events.alter_description(os.getcwd(),desc,event_id,message.author.id)
+        if x==1:
+            await ctx.send("Description can only be altered by the event creator")
+        else:
+            await ctx.send("Description altered")
+    else:
+        await ctx.send("No description provided!")
 
 @bot.command(name="test",help="This is a test!")
 @commands.has_role("bot dev")
