@@ -10,7 +10,8 @@ class events:
         event_list = {}
         for file in os.listdir(PATH):
             if file.endswith(".json"):
-                json_file = open(os.path.join(PATH,file))
+                print(os.path.isfile(os.path.join(PATH,file)))
+                json_file = open(os.path.join(PATH,file),"r")
                 loader = json.load(json_file)
                 print(loader)
                 event_list[loader["uID"]]= { key:loader[key] for key in ["event_date","event_name","event_participants"]}
@@ -23,8 +24,13 @@ class events:
             new_path = os.path.join(PATH,uID)
             if os.path.isfile(PATH+"/"+uID+".json") is False:
                 break
-        event_data = {"event_name":event_name,"event_date":event_date,"event_participants":[],"uID":uID[:8],"creator":id}   
-        f = open(new_path,"w+")
+        event_data = {}   
+        event_data["event_name"] = event_name
+        event_data["event_date"] = event_date
+        event_data["event_participants"] = []
+        event_data["uID"] = str(uID[:8])
+        event_data["creator"] = id
+        f = open(new_path,"w")
         json.dump(event_data,f)
         f.close()
         return uID[:8]
@@ -56,18 +62,34 @@ class events:
                     
                     
     def alter_description(PATH,new_description,event_id,creator):
-        filepath = os.path.join(PATH,event_id,".json")
+        filepath = os.path.join(PATH,event_id+".json")
+        print(os.path.isfile(filepath))
         try:
-            f = open(filepath,"w")
+            f = open(filepath,"r")
         except:
             raise ("Invalid ID: Eventfile not found!")
-        json_data = json.load(filepath)
+        json_data = json.load(f)
         if json_data["creator"] != creator:
             f.close()
             return 1
         json_data["description"] = new_description
+        f.close()
+        f = open(filepath,"w")
         json.dump(json_data,f)
         f.close()
         return 0
+    
+    
+    def add_participant(PATH,new_participant,event_id):
+        try:
+            f = open(os.path.join(PATH,event_id+".json"),"r+")
+        except:
+            raise "Invalid Event ID: Event file not found!"
+        json_data = json.load(f)
+        json_data["event_participants"].append(new_participant)
+        f.truncate(0)
+        json.dumps(json_data,f)
+        f.close()
+        return
             
                     
